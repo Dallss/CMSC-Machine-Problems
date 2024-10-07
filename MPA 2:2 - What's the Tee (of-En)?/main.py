@@ -6,24 +6,26 @@
 ## cubic statments
 #-----------------------------------#
 
+# !!! OPTIMIZE REGEX !!!
+
 import re
 #public variables
 lines = []
 variable_pattern = r'\b[_a-zA-Z][_a-zA-Z0-9]*\b'
-assignment_pattern = rf'{variable_pattern}\s*=\s*(.*?)\s*;'
+assignment_pattern = rf'{variable_pattern}\s*=\s*(.*?)\s*[,;]'
+integer_pattern = r'[+\-*/%]'
+operator_pattern = r'[+\-*/%]'
+
+#ran into problem with case 1 - try tokenizing 
+
+linear_total = 0
+
+state = 'linear'
 
 def inputToArray():
     inp = int(input())
     for i in range(inp):
         lines.append(input())
-
-def lineCounter(line):
-    if lineIdentifier(line) == 'declaration':
-        matches = re.findall(assignment_pattern, line)
-        return len(matches)
-    
-    if lineIdentifier(line) == 'io':                                     # verify
-        return 1
 
 def lineIdentifier(line):    
     # Define line patterns
@@ -41,8 +43,29 @@ def lineIdentifier(line):
     
     return 'undefined.'
 
-def linearHandler():
-    pass
+def lineCounter(line):
+
+    line_type = lineIdentifier(line)
+    if line_type == 'declaration':
+        matches = re.findall(assignment_pattern, line)
+        print('CONSOLE: returned: '+str(len(matches)))
+        return len(matches)
+    
+    if line_type == 'io':                                     # verify
+        return 1
+
+    if line_type == 'assignment':
+        operators = re.findall(operator_pattern,line)
+        print('CONSOLE: returned: '+str(1+len(operators)))
+        return 1 + len(operators)
+
+    else:
+        return -999
+def linearHandler(line):
+    global linear_total
+    linear_total += lineCounter(line)
+
+    
 
 def quadraticHandler():
     pass
@@ -54,5 +77,8 @@ def cubicHandler():
 inputToArray()
 
 for line in lines:
-    print(lineIdentifier(line))
+    if state == 'linear':
+        linearHandler(line)
+
+print('T(n) = ' + str(linear_total))
 
