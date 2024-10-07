@@ -9,23 +9,30 @@
 import re
 #public variables
 lines = []
-
+variable_pattern = r'\b[_a-zA-Z][_a-zA-Z0-9]*\b'
+assignment_pattern = rf'{variable_pattern}\s*=\s*(.*?)\s*;'
 
 def inputToArray():
     inp = int(input())
     for i in range(inp):
         lines.append(input())
 
-def lineIdentifier(line):
-    variable_pattern = r'\b[_a-zA-Z][_a-zA-Z0-9]*\b'
-    assignment_pattern = rf'{variable_pattern}\s*=\s*(.*?)\s*;'
+def lineCounter(line):
+    if lineIdentifier(line) == 'declaration':
+        matches = re.findall(assignment_pattern, line)
+        return len(matches)
     
+    if lineIdentifier(line) == 'io':                                     # verify
+        return 1
+
+def lineIdentifier(line):    
     # Define line patterns
     line_patterns = {
         'declaration': r'(int|char|bool|long|string)\s+[a-zA-Z_]\w*',    # lazy, lacking
         'assignment': assignment_pattern,
         'braced_if': r'if\s*\((.*?)\)\s*{',                              # lazy, greedy, lacking
-        'if': r'if\((.*?)\)'                                             # lazy, greedy, lacking
+        'if': r'if\((.*?)\)',                                            # lazy, greedy, lacking
+        'io': r'(cin|cout)(.*?)'                                         # lazy, greedy, lacking
     }
 
     for type, pattern in line_patterns.items():
