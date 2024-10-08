@@ -12,11 +12,15 @@ import re
 #public variables
 lines = []
 variable_pattern = r'\b[_a-zA-Z][_a-zA-Z0-9]*\b'
-assignment_pattern = rf'{variable_pattern}\s*=\s*(.*?)\s*[,;]'
-integer_pattern = r'[+\-*/%]'
+integer_pattern = r'[-+]?\b\d+\b'
+value_pattern = rf'({integer_pattern}|{variable_pattern})'
 operator_pattern = r'[+\-*/%]'
+assignment_pattern = rf'{variable_pattern}\s*=\s*(.*?)\s*[,;]'
+operation_pattern = rf'\s*{value_pattern}\s*{operator_pattern}\s*{value_pattern}\s*'
 
 #ran into problem with case 1 - try tokenizing 
+
+# x = 10 - -10;
 
 linear_total = 0
 
@@ -55,7 +59,7 @@ def lineCounter(line):
         return 1
 
     if line_type == 'assignment':
-        operators = re.findall(operator_pattern,line)
+        operators = re.findall(operation_pattern,line)
         print('CONSOLE: returned: '+str(1+len(operators)))
         return 1 + len(operators)
 
